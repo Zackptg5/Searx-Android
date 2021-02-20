@@ -55,19 +55,38 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
-  void initPrefs() async {
-    searxURL = await Settings().getURL();
-  }
-
   @override
   void initState() {
     super.initState();
       WidgetsBinding.instance.addObserver(this);
-    initPrefs();
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Settings().getURL(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print(searxURL);
+          return buildMain(context);
+        }
+        return buildLoad(context); // or some other widget
+      }
+    );
+  }
+
+  Widget buildLoad(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Loading Searx Instance'),
+        ),
+        body: Center(
+            child: CircularProgressIndicator()
+        ),
+      );
+    }
+
+  Widget buildMain(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(searxURL.replaceAll('https://', '')),
@@ -123,11 +142,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             title: Text('Enter Searx Instance URL'),
             content: TextField(
               onChanged: (value) {
-                valueText = value;
+                searxURL = value;
               },
               controller: _textFieldController,
-              decoration: InputDecoration(
-                  hintText: "i.e.: https://search.disroot.org"),
+              decoration:
+              InputDecoration(hintText: "i.e.: https://search.disroot.org"),
             ),
             actions: <Widget>[
               FlatButton(
@@ -146,9 +165,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 child: Text('Ok'),
                 onPressed: () {
                   setState(() {
-                    print('2');
-                    Settings().setURL(valueText);
                     Navigator.pop(context);
+                    Settings().setURL(searxURL);
                     Phoenix.rebirth(context);
                   });
                 },
@@ -172,20 +190,20 @@ class Menu extends StatelessWidget {
         if (!controller.hasData) return Container();
         return PopupMenuButton<String>(
           onSelected: (String value) async {
-            switch(value) {
-              case 'Open in Browser': {
-                await launch(await controller.data.currentUrl());
-              }
-              break;
-              case 'View Searx Instances': {
-                await launch(
-                  'https://searx.space',
-                  forceSafariVC: true,
-                  forceWebView: true,
-                  enableJavaScript: true
-                );
-              }
-              break;
+            switch (value) {
+              case 'Open in Browser':
+                {
+                  await launch(await controller.data.currentUrl());
+                }
+                break;
+              case 'View Searx Instances':
+                {
+                  await launch('https://searx.space',
+                      forceSafariVC: true,
+                      forceWebView: true,
+                      enableJavaScript: true);
+                }
+                break;
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -235,9 +253,7 @@ class NavigationControls extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: !webViewReady
-                  ? null
-                  : () => controller.reload(),
+              onPressed: !webViewReady ? null : () => controller.reload(),
             ),
           ],
         );

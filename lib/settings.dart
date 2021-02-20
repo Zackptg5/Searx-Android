@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-String searxURL = "https://search.disroot.org";
+String searxURL;
 
 class Settings {
   Future<SharedPreferences> get prefs async =>
@@ -10,6 +10,11 @@ class Settings {
   }
 
   Future<String> getURL() async {
+    searxURL = (await prefs).getString("url") ?? "https://search.disroot.org";
+    return searxURL;
+  }
+
+  Future<String> getURL2() async {
     return (await prefs).getString("url") ?? "https://search.disroot.org";
   }
 }
