@@ -5,6 +5,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'settings.dart';
 
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
+  }
+}
+
 void main() {
   runApp(
     Phoenix(
@@ -67,7 +73,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       future: Settings().getURL(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print(searxURL);
           return buildMain(context);
         }
         return buildLoad(context); // or some other widget
@@ -89,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget buildMain(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(searxURL.replaceAll('https://', '')),
+        title: Text(searxURL.replaceAll(RegExp(r'//search.|'), '').replaceAll(RegExp(r'https:[/]*|http:[/]*|/searx/|.[a-z:0-9]*$'), '').capitalize()),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
           NavigationControls(_controller.future),
@@ -103,7 +108,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _controller.complete(webViewController);
         },
       ),
-      floatingActionButton: _instanceButton(),
     );
   }
 
@@ -112,68 +116,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final Brightness brightness =
         WidgetsBinding.instance.window.platformBrightness;
     //inform listeners and rebuild widget tree
-  }
-
-  _instanceButton() {
-    return FutureBuilder<WebViewController>(
-      future: _controller.future,
-      builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> controller) {
-        if (controller.hasData) {
-          return FloatingActionButton(
-            onPressed: () {
-              _displayTextInputDialog(context);
-            },
-            child: Icon(Icons.privacy_tip_outlined),
-          );
-        }
-        return Container();
-      },
-    );
-  }
-
-  TextEditingController _textFieldController = TextEditingController();
-  String valueText;
-  Future<void> _displayTextInputDialog(BuildContext context) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Enter Searx Instance URL'),
-            content: TextField(
-              onChanged: (value) {
-                searxURL = value;
-              },
-              controller: _textFieldController,
-              decoration:
-              InputDecoration(hintText: "i.e.: https://search.disroot.org"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                color: Colors.red,
-                textColor: Colors.white,
-                child: Text('Cancel'),
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              FlatButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                child: Text('Ok'),
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                    Settings().setURL(searxURL);
-                    Phoenix.rebirth(context);
-                  });
-                },
-              ),
-            ],
-          );
-        });
   }
 }
 
@@ -204,6 +146,11 @@ class Menu extends StatelessWidget {
                       enableJavaScript: true);
                 }
                 break;
+              case 'Change Searx Instance':
+                {
+                  _displayTextInputDialog(context);
+                }
+                break;
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
@@ -215,10 +162,53 @@ class Menu extends StatelessWidget {
               value: 'View Searx Instances',
               child: Text('View Searx Instances'),
             ),
+            const PopupMenuItem<String>(
+              value: 'Change Searx Instance',
+              child: Text('Change Searx Instance'),
+            ),
           ],
         );
       },
     );
+  }
+
+  TextEditingController _textFieldController = TextEditingController();
+  Future<void> _displayTextInputDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Enter Searx Instance URL'),
+            content: TextField(
+              onChanged: (value) {
+                searxURL = value;
+              },
+              controller: _textFieldController,
+              decoration:
+              InputDecoration(hintText: "i.e.: https://search.disroot.org"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.red,
+                textColor: Colors.white,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                color: Colors.green,
+                textColor: Colors.white,
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Settings().setURL(searxURL);
+                  Phoenix.rebirth(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 }
 
