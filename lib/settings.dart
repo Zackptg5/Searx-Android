@@ -13,8 +13,4 @@ class Settings {
     searxURL = (await prefs).getString("url") ?? "https://search.disroot.org";
     return searxURL;
   }
-
-  Future<String> getURL2() async {
-    return (await prefs).getString("url") ?? "https://search.disroot.org";
-  }
 }
