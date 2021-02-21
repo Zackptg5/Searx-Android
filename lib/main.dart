@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -65,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
       WidgetsBinding.instance.addObserver(this);
+      if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
   @override
@@ -135,7 +137,10 @@ class Menu extends StatelessWidget {
             switch (value) {
               case 'Open in Browser':
                 {
-                  await launch(await controller.data.currentUrl());
+                  await launch(await controller.data.currentUrl(),
+                    forceSafariVC: false,
+                    forceWebView: false,
+                  );
                 }
                 break;
               case 'View Searx Instances':
@@ -175,40 +180,40 @@ class Menu extends StatelessWidget {
   TextEditingController _textFieldController = TextEditingController();
   Future<void> _displayTextInputDialog(BuildContext context) async {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Enter Searx Instance URL'),
-            content: TextField(
-              onChanged: (value) {
-                searxURL = value;
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter Searx Instance URL'),
+          content: TextField(
+            onChanged: (value) {
+              searxURL = value;
+            },
+            controller: _textFieldController,
+            decoration:
+            InputDecoration(hintText: "i.e.: https://search.disroot.org"),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              color: Colors.red,
+              textColor: Colors.white,
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
               },
-              controller: _textFieldController,
-              decoration:
-              InputDecoration(hintText: "i.e.: https://search.disroot.org"),
             ),
-            actions: <Widget>[
-              FlatButton(
-                color: Colors.red,
-                textColor: Colors.white,
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Settings().setURL(searxURL);
-                  Phoenix.rebirth(context);
-                },
-              ),
-            ],
-          );
-        });
+            FlatButton(
+              color: Colors.blue,
+              textColor: Colors.white,
+              child: Text('Ok'),
+              onPressed: () async {
+                Navigator.pop(context);
+                Settings().setURL(searxURL);
+                Phoenix.rebirth(context);
+              },
+            ),
+          ],
+        );
+      });
   }
 }
 
