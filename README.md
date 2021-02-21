@@ -1,16 +1,15 @@
-# searx
+# Searx for Android
 
-Android app for searching the web with Searx
+Android app for searching the web with Searx. Uses Flutter webview
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Flutter application.
+* Default instance is https://search.disroot.org
+* Menu Options:
+  * Open in browser - opens current page in your web browser
+  * View Searx Instances - takes you to the searx.space page that lists all public searx instances
+  * Change Searcx Instance - Put in the url of the instance you want to choose - will default to disroot if url isn't valid
 
-A few resources to get you started if this is your first Flutter project:
+## Notes
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* Tested for android, untested for iOS
