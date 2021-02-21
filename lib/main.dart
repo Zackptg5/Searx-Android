@@ -125,6 +125,22 @@ class Menu extends StatelessWidget {
   Menu(this._webViewControllerFuture);
   final Future<WebViewController> _webViewControllerFuture;
 
+  Widget buildInstance(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Searx Instances'),
+        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+      ),
+      body: WebView(
+        initialUrl: 'https://searx.space',
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController webViewController) {
+          _MyHomePageState()._controller.complete(webViewController);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -145,10 +161,10 @@ class Menu extends StatelessWidget {
                 break;
               case 'View Searx Instances':
                 {
-                  await launch('https://searx.space',
-                      forceSafariVC: true,
-                      forceWebView: true,
-                      enableJavaScript: true);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => buildInstance(context)),
+                  );
                 }
                 break;
               case 'Change Searx Instance':
