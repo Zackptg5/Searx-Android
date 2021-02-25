@@ -96,7 +96,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget buildMain(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(searxURL.replaceAll(RegExp(r'//search.|'), '').replaceAll(RegExp(r'https:[/]*|http:[/]*|/searx/|.[a-z:0-9]*$'), '').capitalize()),
+        title: FlatButton(
+          textColor: Colors.white,
+          onPressed: () {
+            Phoenix.rebirth(context);
+          },
+          child: Text(
+            searxURL.replaceAll(RegExp(r'//search.|'), '').replaceAll(RegExp(r'https:[/]*|http:[/]*|/searx/|.[a-z:0-9]*$'), '').capitalize(),
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
           NavigationControls(_controller.future),
