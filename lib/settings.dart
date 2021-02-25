@@ -19,7 +19,6 @@ class Settings {
     await Fluttertoast.showToast(
         msg: "Invalid URL! Setting to default",
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.red,
         textColor: Colors.white,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'settings.dart';
 
 extension StringExtension on String {
@@ -33,7 +34,9 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.lightBlue,
+        primarySwatch: Colors.deepPurple,
+        primaryColor: Colors.deepPurple, //primarySwatch ignored when brightness is set to dark
+        accentColor: Colors.deepPurpleAccent,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Searx Home Page'),
@@ -137,12 +140,34 @@ class Menu extends StatelessWidget {
   Widget buildInstance(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Searx Instances'),
+        title: Text('Select Searx Instance'),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
       ),
       body: WebView(
         initialUrl: 'https://searx.space',
         javascriptMode: JavascriptMode.unrestricted,
+        // navigationDelegate: this._interceptNavigation,
+        navigationDelegate: (request) {
+          if (request.url.contains('https://github.com') ||
+              request.url.contains('https://cryptcheck.fr') ||
+              request.url.contains('https://observatory.mozilla.org') ||
+              request.url.contains('https://www.w3.org/TR/server-timing') ||
+              request.url.contains('https://crt.sh') ||
+              request.url.contains('https://searx.neocities.org/changelog.html') ||
+              request.url.contains('https://searx.space/data/instances.json') ||
+              request.url.contains('https://searx.github.io')
+          ){
+            return NavigationDecision.prevent;
+          } else if (request.url.contains('https://searx.space')) {
+            launch(request.url);
+            return NavigationDecision.navigate;
+          } else {
+            searxURL = request.url;
+            Settings().setURL(searxURL);
+            Phoenix.rebirth(context);
+            return NavigationDecision.prevent;
+          }
+        },
         onWebViewCreated: (WebViewController webViewController) {
           _MyHomePageState()._controller.complete(webViewController);
         },
@@ -154,8 +179,7 @@ class Menu extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _webViewControllerFuture,
-      builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> controller) {
+      builder: (BuildContext context, AsyncSnapshot<WebViewController> controller) {
         if (!controller.hasData) return Container();
         return PopupMenuButton<String>(
           onSelected: (String value) async {
@@ -168,15 +192,23 @@ class Menu extends StatelessWidget {
                   );
                 }
                 break;
-              case 'View Searx Instances':
+              case 'Select Searx Instance':
                 {
+                  await Fluttertoast.showToast(
+                      msg: "Click on the link you want to change to",
+                      toastLength: Toast.LENGTH_SHORT,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.deepPurple,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => buildInstance(context)),
                   );
                 }
                 break;
-              case 'Change Searx Instance':
+              case 'Enter Custom Searx Instance':
                 {
                   _displayTextInputDialog(context);
                 }
@@ -189,12 +221,12 @@ class Menu extends StatelessWidget {
               child: Text('Open in Browser'),
             ),
             const PopupMenuItem<String>(
-              value: 'View Searx Instances',
-              child: Text('View Searx Instances'),
+              value: 'Select Searx Instance',
+              child: Text('Select Searx Instance'),
             ),
             const PopupMenuItem<String>(
-              value: 'Change Searx Instance',
-              child: Text('Change Searx Instance'),
+              value: 'Enter Custom Searx Instance',
+              child: Text('Enter Custom Searx Instance'),
             ),
           ],
         );
