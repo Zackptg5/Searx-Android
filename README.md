@@ -1,6 +1,6 @@
 # Searx for Android
 
-Unofficial android app for searching the web with Searx. Uses Flutter webview. Note that I am not affiliated with (Searx.)[https://github.com/searx/searx]
+Unofficial android app for searching the web with Searx. Uses Flutter webview. Note that I am not affiliated with [Searx.](https://github.com/searx/searx)
 
 ## Usage
 
