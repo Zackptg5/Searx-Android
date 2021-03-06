@@ -86,21 +86,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget buildLoad(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Loading Searx Instance'),
-        ),
-        body: Center(
-            child: CircularProgressIndicator()
-        ),
-      );
-    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Loading'),
+      ),
+      body: Center(
+        child: CircularProgressIndicator()
+      ),
+    );
+  }
 
   Widget buildMain(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FlatButton(
-          textColor: Colors.white,
+        title: TextButton(
+          style: TextButton.styleFrom(
+            primary: Colors.white,
+          ),
           onPressed: () {
             Phoenix.rebirth(context);
           },
@@ -250,17 +252,22 @@ class Menu extends StatelessWidget {
             InputDecoration(hintText: "i.e.: https://search.disroot.org"),
           ),
           actions: <Widget>[
-            FlatButton(
-              color: Colors.red,
-              textColor: Colors.white,
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.red,
+              ),
+
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
-            FlatButton(
-              color: Colors.blue,
-              textColor: Colors.white,
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.blue,
+              ),
               child: Text('Ok'),
               onPressed: () async {
                 Navigator.pop(context);
@@ -320,7 +327,7 @@ class NavigationControls extends StatelessWidget {
     if (canNavigate) {
       goBack ? controller.goBack() : controller.goForward();
     } else {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("No ${goBack ? 'back' : 'forward'} history item")),
       );

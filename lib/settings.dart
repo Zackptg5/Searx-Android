@@ -14,16 +14,27 @@ class Settings {
   }
 
   Future<void> errURL() async {
-    searxURL = defaultURL;
-    await (await prefs).setString("url", defaultURL);
-    await Fluttertoast.showToast(
-        msg: "Invalid URL! Setting to default",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
+    if (searxURL == defaultURL) {
+      await Fluttertoast.showToast(
+          msg: "Unable to load default instance! Change instance to something else",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    } else {
+      searxURL = defaultURL;
+      await (await prefs).setString("url", defaultURL);
+      await Fluttertoast.showToast(
+          msg: "Invalid URL! Setting to default",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
   }
 
   Future<String> getURL() async {
