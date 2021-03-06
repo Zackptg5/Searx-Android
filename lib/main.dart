@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:searx/pihole_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'settings.dart';
 import 'settings.dart';
 
 extension StringExtension on String {
@@ -65,11 +67,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
+  void initSettings() async {
+    await Settings().getPihole();
+    await Settings().getPiholeURL();
+  }
+
   @override
   void initState() {
     super.initState();
       WidgetsBinding.instance.addObserver(this);
       if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    initSettings();
   }
 
   @override
@@ -210,9 +218,36 @@ class Menu extends StatelessWidget {
                   );
                 }
                 break;
-              case 'Enter Custom Searx Instance':
+              case 'Enter Custom Searx Instance URL':
                 {
-                  _displayTextInputDialog(context);
+                  _displayTextInputDialog(context, true);
+                }
+                break;
+              case 'Toggle Pihole Button':
+                {
+                  if (piholeURL == null) {
+                    await Fluttertoast.showToast(
+                        msg: "Pihole URL not set! Not enabling Pihole button!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        timeInSecForIosWeb: 2,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
+                  } else {
+                    if (usePihole) {
+                      usePihole = false;
+                    } else {
+                      usePihole = true;
+                    }
+                    Settings().setBool(usePihole);
+                    Phoenix.rebirth(context);
+                  }
+                }
+                break;
+              case 'Enter Pihole URL':
+                {
+                  _displayTextInputDialog(context, false);
                 }
                 break;
             }
@@ -227,8 +262,16 @@ class Menu extends StatelessWidget {
               child: Text('Select Searx Instance'),
             ),
             const PopupMenuItem<String>(
-              value: 'Enter Custom Searx Instance',
-              child: Text('Enter Custom Searx Instance'),
+              value: 'Enter Custom Searx Instance URL',
+              child: Text('Enter Custom Searx Instance URL'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Enter Pihole URL',
+              child: Text('Enter Pihole URL'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Toggle Pihole Button',
+              child: Text('Toggle Pihole Button'),
             ),
           ],
         );
@@ -237,19 +280,19 @@ class Menu extends StatelessWidget {
   }
 
   TextEditingController _textFieldController = TextEditingController();
-  Future<void> _displayTextInputDialog(BuildContext context) async {
+  Future<void> _displayTextInputDialog(BuildContext context, bool searx) async {
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Enter Searx Instance URL'),
+          title: Text('Enter URL'),
           content: TextField(
             onChanged: (value) {
-              searxURL = value;
+              if (searx) {searxURL = value;} else {piholeURL = value;}
             },
             controller: _textFieldController,
             decoration:
-            InputDecoration(hintText: "i.e.: https://search.disroot.org"),
+            InputDecoration(hintText: "i.e.: https://whatever.com"),
           ),
           actions: <Widget>[
             TextButton(
@@ -271,7 +314,7 @@ class Menu extends StatelessWidget {
               child: Text('Ok'),
               onPressed: () async {
                 Navigator.pop(context);
-                Settings().setURL(searxURL);
+                if (searx) {Settings().setURL(searxURL);} else {Settings().setPiholeURL(piholeURL);}
                 Phoenix.rebirth(context);
               },
             ),
@@ -286,6 +329,22 @@ class NavigationControls extends StatelessWidget {
       : assert(_webViewControllerFuture != null);
 
   final Future<WebViewController> _webViewControllerFuture;
+
+  Widget buildPihole(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Pihole'),
+        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+      ),
+      body: WebView(
+        initialUrl: piholeURL,
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController webViewController) {
+          _MyHomePageState()._controller.complete(webViewController);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -313,6 +372,13 @@ class NavigationControls extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: !webViewReady ? null : () => controller.reload(),
+            ),
+            if (usePihole && piholeURL != null) IconButton(
+              icon: const Icon(Pihole.pi_hole),
+              onPressed: !webViewReady ? null : () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => buildPihole(context)),
+              ),
             ),
           ],
         );
