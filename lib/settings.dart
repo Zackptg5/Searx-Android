@@ -29,7 +29,7 @@ class Settings {
   Future<String> getURL() async {
     searxURL = (await prefs).getString("url") ?? defaultURL;
     try {
-      var response = (await http.get(searxURL)).statusCode;
+      var response = (await http.get(Uri.parse(searxURL))).statusCode;
       if (response != 200) {
         await errURL();
       }
