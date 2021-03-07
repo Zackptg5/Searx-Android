@@ -66,7 +66,7 @@ class Settings {
 
   Future<void> errPiholeURL() async {
     piholeURL = null;
-    await (await prefs).remove(piholeURL);
+    await (await prefs).remove("url2");
     await Fluttertoast.showToast(
         msg: "Invalid URL! Disabling Pihole button!",
         toastLength: Toast.LENGTH_SHORT,
@@ -78,7 +78,7 @@ class Settings {
   }
 
   Future<String> getPiholeURL() async {
-    if (piholeURL == null) {return null;} else {piholeURL = (await prefs).getString("url2") ?? null;}
+    piholeURL = (await prefs).getString("url2") ?? null;
     if (piholeURL == null) {return null;}
     try {
       var response = (await http.get(Uri.parse(piholeURL))).statusCode;
