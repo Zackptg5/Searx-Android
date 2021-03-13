@@ -5,9 +5,8 @@ import 'package:searx/pihole_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'settings.dart';
-import 'settings.dart';
+import 'settingsPage.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -80,6 +79,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     initSettings();
   }
 
+  Future<bool> back() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyHomePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -105,32 +111,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget buildMain(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: TextButton(
-          style: TextButton.styleFrom(
-            primary: Colors.white,
+    return new WillPopScope(
+      onWillPop: back,
+      child: Scaffold(
+        appBar: AppBar(
+          title: TextButton(
+            style: TextButton.styleFrom(
+              primary: Colors.white,
+            ),
+            onPressed: () {
+              Phoenix.rebirth(context);
+            },
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 20.0),
+            ),
           ),
-          onPressed: () {
-            Phoenix.rebirth(context);
-          },
-          child: Text(
-            searxURL.replaceAll(RegExp(r'//search.|'), '').replaceAll(RegExp(r'https:[/]*|http:[/]*|/searx/|.[a-z:0-9]*$'), '').capitalize(),
-            style: TextStyle(fontSize: 20.0),
-          ),
+          // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+          actions: <Widget>[
+            NavigationControls(_controller.future),
+          ],
         ),
-        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-        actions: <Widget>[
-          NavigationControls(_controller.future),
-          Menu(_controller.future),
-        ],
-      ),
-      body: WebView(
-        initialUrl: searxURL,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _controller.complete(webViewController);
-        },
+        body: WebView(
+          initialUrl: searxURL,
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller.complete(webViewController);
+          },
+        ),
       ),
     );
   }
@@ -140,187 +148,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final Brightness brightness =
         WidgetsBinding.instance.window.platformBrightness;
     //inform listeners and rebuild widget tree
-  }
-}
-
-class Menu extends StatelessWidget {
-  Menu(this._webViewControllerFuture);
-  final Future<WebViewController> _webViewControllerFuture;
-
-  Widget buildInstance(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Searx Instance'),
-        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-      ),
-      body: WebView(
-        initialUrl: 'https://searx.space',
-        javascriptMode: JavascriptMode.unrestricted,
-        // navigationDelegate: this._interceptNavigation,
-        navigationDelegate: (request) {
-          if (request.url.contains('https://github.com') ||
-              request.url.contains('https://cryptcheck.fr') ||
-              request.url.contains('https://observatory.mozilla.org') ||
-              request.url.contains('https://www.w3.org/TR/server-timing') ||
-              request.url.contains('https://crt.sh') ||
-              request.url.contains('https://searx.neocities.org/changelog.html') ||
-              request.url.contains('https://searx.space/data/instances.json') ||
-              request.url.contains('https://searx.github.io')
-          ){
-            return NavigationDecision.prevent;
-          } else if (request.url.contains('https://searx.space')) {
-            launch(request.url);
-            return NavigationDecision.navigate;
-          } else {
-            searxURL = request.url;
-            Settings().setURL(searxURL);
-            Phoenix.rebirth(context);
-            return NavigationDecision.prevent;
-          }
-        },
-        onWebViewCreated: (WebViewController webViewController) {
-          _MyHomePageState()._controller.complete(webViewController);
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _webViewControllerFuture,
-      builder: (BuildContext context, AsyncSnapshot<WebViewController> controller) {
-        if (!controller.hasData) return Container();
-        return PopupMenuButton<String>(
-          onSelected: (String value) async {
-            switch (value) {
-              case 'Open in Browser':
-                {
-                  await launch(await controller.data.currentUrl(),
-                    forceSafariVC: false,
-                    forceWebView: false,
-                  );
-                }
-                break;
-              case 'Select Searx Instance':
-                {
-                  await Fluttertoast.showToast(
-                      msg: "Click on the link you want to change to",
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.deepPurple,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => buildInstance(context)),
-                  );
-                }
-                break;
-              case 'Enter Custom Searx Instance URL':
-                {
-                  _displayTextInputDialog(context, true);
-                }
-                break;
-              case 'Toggle Pihole Button':
-                {
-                  if (piholeURL == null) {
-                    await Fluttertoast.showToast(
-                        msg: "Pihole URL not set! Not enabling Pihole button!",
-                        toastLength: Toast.LENGTH_SHORT,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  } else {
-                    if (usePihole) {
-                      usePihole = false;
-                    } else {
-                      usePihole = true;
-                    }
-                    Settings().setBool(usePihole);
-                    Phoenix.rebirth(context);
-                  }
-                }
-                break;
-              case 'Enter Pihole URL':
-                {
-                  _displayTextInputDialog(context, false);
-                }
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-            const PopupMenuItem<String>(
-              value: 'Open in Browser',
-              child: Text('Open in Browser'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Select Searx Instance',
-              child: Text('Select Searx Instance'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Enter Custom Searx Instance URL',
-              child: Text('Enter Custom Searx Instance URL'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Enter Pihole URL',
-              child: Text('Enter Pihole URL'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Toggle Pihole Button',
-              child: Text('Toggle Pihole Button'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  TextEditingController _textFieldController = TextEditingController();
-  Future<void> _displayTextInputDialog(BuildContext context, bool searx) async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Enter URL'),
-          content: TextField(
-            onChanged: (value) {
-              if (searx) {searxURL = value;} else {piholeURL = value;}
-            },
-            controller: _textFieldController,
-            decoration:
-            InputDecoration(hintText: "i.e.: https://whatever.com"),
-          ),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                backgroundColor: Colors.red,
-              ),
-
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: Text('Ok'),
-              onPressed: () async {
-                Navigator.pop(context);
-                if (searx) {Settings().setURL(searxURL);} else {Settings().setPiholeURL(piholeURL);}
-                Phoenix.rebirth(context);
-              },
-            ),
-          ],
-        );
-      });
   }
 }
 
@@ -356,28 +183,111 @@ class NavigationControls extends StatelessWidget {
             snapshot.connectionState == ConnectionState.done;
         final WebViewController controller = snapshot.data;
         return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios),
-              onPressed: !webViewReady
-                  ? null
-                  : () => navigate(context, controller, goBack: true),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.arrow_drop_down_circle_outlined),
+              color: Colors.deepPurple,
+              enableFeedback: true,
+              tooltip: 'Navigation Controls',
+              onSelected: (String value) {
+                switch (value) {
+                  case 'Back': {
+                    navigate(context, controller, goBack: true);
+                  } break;
+                  case 'Forward': {
+                    navigate(context, controller, goBack: false);
+                  } break;
+                  case 'Refresh': {
+                    controller.reload();
+                  } break;
+                  case 'Home': {
+                    Phoenix.rebirth(context);
+                  } break;
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                const PopupMenuItem<String>(
+                  value: 'Back',
+                  child: ListTile(
+                    title: const Icon(Icons.arrow_back),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Forward',
+                  child: ListTile(
+                    title: const Icon(Icons.arrow_forward),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Refresh',
+                  child: ListTile(
+                    title: const Icon(Icons.refresh),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Home',
+                  child: ListTile(
+                    title: const Icon(Icons.home),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+              ],
             ),
+            // IconButton(
+            //   // constraints: BoxConstraints(),
+            //   icon: const Icon(Icons.arrow_back_ios),
+            //   onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: true),
+            // ),
+            // IconButton(
+            //   // constraints: BoxConstraints(),
+            //   icon: const Icon(Icons.arrow_forward_ios),
+            //   onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: false),
+            // ),
+            // IconButton(
+            //   // constraints: BoxConstraints(),
+            //   icon: const Icon(Icons.refresh),
+            //   onPressed: !webViewReady ? null : () => controller.reload(),
+            // ),
+            // IconButton(
+            //   icon: const Icon(Icons.home),
+            //   onPressed: !webViewReady ? null : () => Phoenix.rebirth(context),
+            // ),
             IconButton(
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: !webViewReady
-                  ? null
-                  : () => navigate(context, controller, goBack: false),
+              // constraints: BoxConstraints(),
+              icon: const Icon(Icons.open_in_browser),
+              enableFeedback: true,
+              tooltip: 'Open with Browser',
+              onPressed: !webViewReady ? null : () async => await launch(await controller.currentUrl(),
+                forceSafariVC: false,
+                forceWebView: false,
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: !webViewReady ? null : () => controller.reload(),
-            ),
-            if (usePihole && piholeURL != null) IconButton(
+            if (usePihole) IconButton(
+              // constraints: BoxConstraints(),
               icon: const Icon(Pihole.pi_hole),
+              enableFeedback: true,
+              tooltip: 'Open Pi-hole page',
               onPressed: !webViewReady ? null : () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => buildPihole(context)),
+              ),
+            ),
+            IconButton(
+              // constraints: BoxConstraints(),
+              icon: const Icon(Icons.settings),
+              enableFeedback: true,
+              tooltip: 'Settings',
+              onPressed: !webViewReady ? null : () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
               ),
             ),
           ],

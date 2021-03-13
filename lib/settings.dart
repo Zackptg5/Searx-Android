@@ -6,10 +6,16 @@ String searxURL;
 String defaultURL = "https://search.disroot.org";
 bool usePihole;
 String piholeURL;
+String title = 'Searx';
 
 class Settings {
   Future<SharedPreferences> get prefs async =>
       await SharedPreferences.getInstance();
+
+  Future<void> getTitle(String url) async{
+    var webpage = (await http.read(Uri.parse(url)));
+    title = webpage.substring((webpage.indexOf('<title>') + 7), (webpage.indexOf('</title>')));
+  }
 
   void setURL(String data) async {
     await (await prefs).setString("url", data);
@@ -17,6 +23,7 @@ class Settings {
 
   Future<void> errURL() async {
     if (searxURL == defaultURL) {
+      title = 'Searx';
       await Fluttertoast.showToast(
           msg: "Unable to load default instance! Change instance to something else",
           toastLength: Toast.LENGTH_SHORT,
@@ -28,6 +35,7 @@ class Settings {
     } else {
       searxURL = defaultURL;
       await (await prefs).setString("url", defaultURL);
+      await getTitle(searxURL);
       await Fluttertoast.showToast(
           msg: "Invalid URL! Setting to default",
           toastLength: Toast.LENGTH_SHORT,
@@ -49,6 +57,7 @@ class Settings {
     } catch(err){
       await errURL();
     }
+    await getTitle(searxURL);
     return searxURL;
   }
 
@@ -65,8 +74,10 @@ class Settings {
   }
 
   Future<void> errPiholeURL() async {
-    piholeURL = null;
+    piholeURL = 'Not Set';
+    usePihole = false;
     await (await prefs).remove("url2");
+    await (await prefs).remove("bool");
     await Fluttertoast.showToast(
         msg: "Invalid URL! Disabling Pihole button!",
         toastLength: Toast.LENGTH_SHORT,
@@ -78,8 +89,8 @@ class Settings {
   }
 
   Future<String> getPiholeURL() async {
-    piholeURL = (await prefs).getString("url2") ?? null;
-    if (piholeURL == null) {return null;}
+    piholeURL = (await prefs).getString("url2") ?? 'Not Set';
+    if (piholeURL == 'Not Set') {return null;}
     try {
       var response = (await http.get(Uri.parse(piholeURL))).statusCode;
       if (response != 200) {
