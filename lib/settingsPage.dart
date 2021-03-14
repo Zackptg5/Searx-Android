@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -92,7 +91,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                 setState(() {
                   if (piholeURL == 'Not Set') {
                     Fluttertoast.showToast(
-                      msg: "Pihole URL not set! Not enabling Pihole button!",
+                      msg: "Pi-hole URL not set! Leaving disabled!",
                       toastLength: Toast.LENGTH_SHORT,
                       timeInSecForIosWeb: 2,
                       backgroundColor: Colors.red,
@@ -105,11 +104,11 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                   }
                 });
               },
-              title: Text('Enable Pihole'),
-              subtitle: Text('Will show the pihole button in the navigation bar'),
+              title: Text('Enable Pi-hole'),
+              subtitle: Text('Will enable longpressing title to open pi-hole'),
             ),
             new ListTile(
-              title: Text('Pihole URL'),
+              title: Text('Pi-hole URL'),
               trailing: new Text(piholeURL),
               onTap: () {
                 return showDialog(
