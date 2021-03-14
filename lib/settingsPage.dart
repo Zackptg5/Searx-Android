@@ -17,7 +17,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
   void initSettings() async {
-    await Settings().getPihole();
     await Settings().getPiholeURL();
     setState(() {});
   }
@@ -85,30 +84,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
         body: new ListView(
           padding: EdgeInsets.all(10),
           children: <Widget>[
-            new CheckboxListTile(
-              value: usePihole,
-              onChanged: (bool isAuto) {
-                setState(() {
-                  if (piholeURL == 'Not Set') {
-                    Fluttertoast.showToast(
-                      msg: "Pi-hole URL not set! Leaving disabled!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                    );
-                  } else {
-                    usePihole = isAuto;
-                    Settings().setBool(usePihole);
-                  }
-                });
-              },
-              title: Text('Enable Pi-hole'),
-              subtitle: Text('Will enable longpressing title to open pi-hole'),
-            ),
             new ListTile(
-              title: Text('Pi-hole URL'),
+              title: Text('Pi-hole URL (Optional)'),
               trailing: new Text(piholeURL),
               onTap: () {
                 return showDialog(
@@ -121,7 +98,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                   setState(() {});
                 });
               },
-              subtitle: Text('Tap to change URL'),
+              subtitle: Text('Tap to change URL. Long press the title (searx instance name - top left of main bar) to open pi-hole'),
             ),
             new ListTile(
               title: Text('Searx URL'),

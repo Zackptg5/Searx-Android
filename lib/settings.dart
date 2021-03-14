@@ -3,9 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 String searxURL;
-String defaultURL = "https://search.disroot.org";
-bool usePihole;
 String piholeURL;
+String defaultURL = "https://search.disroot.org";
 String title = 'Searx';
 
 class Settings {
@@ -61,25 +60,15 @@ class Settings {
     return searxURL;
   }
 
-  void setBool(bool data) async {
-    await (await prefs).setBool("bool", data);
-  }
-
-  Future<bool> getPihole() async {
-    usePihole = (await prefs).getBool("bool") ?? false;
-  }
-
   void setPiholeURL(String data) async {
     await (await prefs).setString("url2", data);
   }
 
   Future<void> errPiholeURL() async {
     piholeURL = 'Not Set';
-    usePihole = false;
     await (await prefs).remove("url2");
-    await (await prefs).remove("bool");
     await Fluttertoast.showToast(
-        msg: "Invalid URL! Disabling Pihole button!",
+        msg: "Invalid URL! Disabling Pi-hole functionality!",
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 2,
         backgroundColor: Colors.red,

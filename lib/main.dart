@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:searx/pihole_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -68,7 +66,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
   void initSettings() async {
-    await Settings().getPihole();
     await Settings().getPiholeURL();
   }
 
@@ -141,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               Phoenix.rebirth(context);
             },
             onLongPress: () {
-              if (usePihole) {
+              if (piholeURL != 'Not Set') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => buildPihole(context)),
