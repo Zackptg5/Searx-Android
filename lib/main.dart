@@ -193,25 +193,25 @@ class NavigationControls extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             IconButton(
-              constraints: BoxConstraints(),
+              // constraints: BoxConstraints(),
               icon: const Icon(Icons.arrow_back_ios),
               tooltip: 'Go back',
               onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: true),
             ),
             IconButton(
-              constraints: BoxConstraints(),
+              // constraints: BoxConstraints(),
               icon: const Icon(Icons.arrow_forward_ios),
               tooltip: 'Go forward',
               onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: false),
             ),
             IconButton(
-              constraints: BoxConstraints(),
+              // constraints: BoxConstraints(),
               icon: const Icon(Icons.refresh),
               tooltip: 'Refresh page',
               onPressed: !webViewReady ? null : () => controller.reload(),
             ),
             IconButton(
-              constraints: BoxConstraints(),
+              // constraints: BoxConstraints(),
               icon: const Icon(Icons.public),
               enableFeedback: true,
               tooltip: 'Open with Browser',
@@ -221,7 +221,7 @@ class NavigationControls extends StatelessWidget {
               ),
             ),
             IconButton(
-              constraints: BoxConstraints(),
+              // constraints: BoxConstraints(),
               icon: const Icon(Icons.settings),
               enableFeedback: true,
               tooltip: 'Settings',
