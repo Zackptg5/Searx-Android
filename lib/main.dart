@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:searx/pihole_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -115,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onWillPop: back,
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: TextButton(
             style: TextButton.styleFrom(
               primary: Colors.white,
@@ -190,85 +192,49 @@ class NavigationControls extends StatelessWidget {
               color: Colors.deepPurple,
               enableFeedback: true,
               tooltip: 'Navigation Controls',
-              onSelected: (String value) {
-                switch (value) {
-                  case 'Back': {
-                    navigate(context, controller, goBack: true);
-                  } break;
-                  case 'Forward': {
-                    navigate(context, controller, goBack: false);
-                  } break;
-                  case 'Refresh': {
-                    controller.reload();
-                  } break;
-                  case 'Home': {
-                    Phoenix.rebirth(context);
-                  } break;
-                }
-              },
               itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                const PopupMenuItem<String>(
-                  value: 'Back',
-                  child: ListTile(
-                    title: const Icon(Icons.arrow_back),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Forward',
-                  child: ListTile(
-                    title: const Icon(Icons.arrow_forward),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Refresh',
-                  child: ListTile(
-                    title: const Icon(Icons.refresh),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Home',
-                  child: ListTile(
-                    title: const Icon(Icons.home),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+                PopupMenuItem(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // IconButton(
+                      //   // constraints: BoxConstraints(),
+                      //   icon: const Icon(Icons.home),
+                      //   tooltip: 'Go Home',
+                      //   onPressed: !webViewReady ? null : () => Phoenix.rebirth(context),
+                      // ),
+                      IconButton(
+                        // constraints: BoxConstraints(),
+                        icon: const Icon(Icons.arrow_back_ios),
+                        tooltip: 'Go back',
+                        onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: true),
+                      ),
+                      IconButton(
+                        // constraints: BoxConstraints(),
+                        icon: const Icon(Icons.arrow_forward_ios),
+                        tooltip: 'Go forward',
+                        onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: false),
+                      ),
+                      IconButton(
+                        // constraints: BoxConstraints(),
+                        icon: const Icon(Icons.refresh),
+                        tooltip: 'Refresh page',
+                        onPressed: !webViewReady ? null : () => controller.reload(),
+                      ),
+                      IconButton(
+                        // constraints: BoxConstraints(),
+                        icon: const Icon(Icons.public),
+                        enableFeedback: true,
+                        tooltip: 'Open with Browser',
+                        onPressed: !webViewReady ? null : () async => await launch(await controller.currentUrl(),
+                          forceSafariVC: false,
+                          forceWebView: false,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            // IconButton(
-            //   // constraints: BoxConstraints(),
-            //   icon: const Icon(Icons.arrow_back_ios),
-            //   onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: true),
-            // ),
-            // IconButton(
-            //   // constraints: BoxConstraints(),
-            //   icon: const Icon(Icons.arrow_forward_ios),
-            //   onPressed: !webViewReady ? null : () => navigate(context, controller, goBack: false),
-            // ),
-            // IconButton(
-            //   // constraints: BoxConstraints(),
-            //   icon: const Icon(Icons.refresh),
-            //   onPressed: !webViewReady ? null : () => controller.reload(),
-            // ),
-            // IconButton(
-            //   icon: const Icon(Icons.home),
-            //   onPressed: !webViewReady ? null : () => Phoenix.rebirth(context),
-            // ),
-            IconButton(
-              // constraints: BoxConstraints(),
-              icon: const Icon(Icons.open_in_browser),
-              enableFeedback: true,
-              tooltip: 'Open with Browser',
-              onPressed: !webViewReady ? null : () async => await launch(await controller.currentUrl(),
-                forceSafariVC: false,
-                forceWebView: false,
-              ),
             ),
             if (usePihole) IconButton(
               // constraints: BoxConstraints(),
@@ -285,7 +251,7 @@ class NavigationControls extends StatelessWidget {
               icon: const Icon(Icons.settings),
               enableFeedback: true,
               tooltip: 'Settings',
-              onPressed: !webViewReady ? null : () => Navigator.pushReplacement(
+              onPressed: !webViewReady ? null : () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
               ),

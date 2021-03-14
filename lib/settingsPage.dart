@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -62,6 +63,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             setState(() {
               searxURL = request.url;
               Settings().setURL(searxURL);
+              Navigator.pop(context);
             });
             return NavigationDecision.prevent; //Put in setState?
           }
@@ -126,17 +128,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
               title: Text('Searx URL'),
               trailing: new Text(searxURL),
               onTap: () {
-                return showDialog(
-                  barrierDismissible: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return new SearxURLDialog();
-                  },
-                ).then((var a) {
-                  setState(() {});
-                });
-              },
-              onLongPress: () {
                 Fluttertoast.showToast(
                     msg: "Click on the link you want to change to",
                     toastLength: Toast.LENGTH_SHORT,
@@ -149,6 +140,17 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                   context,
                   MaterialPageRoute(builder: (context) => buildInstance(context)),
                 );
+              },
+              onLongPress: () {
+                return showDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return new SearxURLDialog();
+                  },
+                ).then((var a) {
+                  setState(() {});
+                });
               },
               subtitle: Text('Tap to select instance, long tap to change to custom URL'),
             ),
