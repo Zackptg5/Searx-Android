@@ -7,6 +7,7 @@ Unofficial android app for searching the web with Searx. Uses Flutter webview. N
 * Default instance is https://search.disroot.org
 * Navigation Options:
   * Home - tap on the title (top left text - searx instance name)
+    * Pi-hole - long tap on title (if pi-hole url is set)
   * Back
   * Forward
   * Refresh
@@ -15,7 +16,6 @@ Unofficial android app for searching the web with Searx. Uses Flutter webview. N
   * Select Searx Instance - takes you to the searx.space page that lists all of the active public searx instances - tap on the one you want to use
     * Enter Custom Searx Instance - Put in the url of the instance you want to choose - will default to disroot if url isn't valid
   * Enter Pi-hole URL - put url of pi-hole instance here if applicable
-  * Enable pi-hole button - has the button show up in the top bar
 
 ## Notes
 
