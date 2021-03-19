@@ -65,16 +65,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
-  void initSettings() async {
-    await Settings().getPiholeURL();
-  }
-
   @override
   void initState() {
     super.initState();
       WidgetsBinding.instance.addObserver(this);
       if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-    initSettings();
   }
 
   Future<bool> back() {

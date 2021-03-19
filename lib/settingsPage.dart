@@ -17,7 +17,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
   void initSettings() async {
-    await Settings().getPiholeURL();
     setState(() {});
   }
 
