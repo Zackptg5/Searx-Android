@@ -2,8 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-String searxURL;
-String piholeURL;
+String? searxURL;
+String? piholeURL;
 String defaultURL = "https://search.disroot.org";
 String title = 'Searx';
 
@@ -46,12 +46,12 @@ class Settings {
     );
   }
 
-  Future<String> getURL() async {
+  Future<String?> getURL() async {
     searxURL = (await prefs).getString("url") ?? defaultURL;
     piholeURL = (await prefs).getString("url2") ?? 'Not Set';
-    List<String> items = [searxURL, piholeURL];
+    List<String?> items = [searxURL, piholeURL];
     for (var i = 0; i < items.length; i++) {
-      var item = items[i];
+      var item = items[i]!;
       try {
         var response = (await http.get(Uri.parse(item))).statusCode;
         if (response != 200) {
@@ -62,7 +62,7 @@ class Settings {
       }
     }
     // Set title of appbar to title of searx instance (webpage title)
-    var webpage = (await http.read(Uri.parse(searxURL)));
+    var webpage = (await http.read(Uri.parse(searxURL!)));
     title = webpage.substring((webpage.indexOf('<title>') + 7), (webpage.indexOf('</title>')));
     // Have to return something for buildMain to trigger
     return searxURL;

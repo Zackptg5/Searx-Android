@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -56,7 +56,7 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-      WidgetsBinding.instance.addObserver(this);
+      WidgetsBinding.instance!.addObserver(this);
       if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
@@ -77,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       context,
       MaterialPageRoute(builder: (context) => MyHomePage()),
     );
+    throw '';
   }
 
   @override
@@ -164,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangePlatformBrightness() {
     final Brightness brightness =
-        WidgetsBinding.instance.window.platformBrightness;
+        WidgetsBinding.instance!.window.platformBrightness;
     //inform listeners and rebuild widget tree
   }
 }
@@ -183,7 +184,7 @@ class NavigationControls extends StatelessWidget {
           (BuildContext context, AsyncSnapshot<WebViewController> snapshot) {
         final bool webViewReady =
             snapshot.connectionState == ConnectionState.done;
-        final WebViewController controller = snapshot.data;
+        final WebViewController? controller = snapshot.data;
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
@@ -203,14 +204,14 @@ class NavigationControls extends StatelessWidget {
               // constraints: BoxConstraints(),
               icon: const Icon(Icons.refresh),
               tooltip: 'Refresh page',
-              onPressed: !webViewReady ? null : () => controller.reload(),
+              onPressed: !webViewReady ? null : () => controller!.reload(),
             ),
             IconButton(
               // constraints: BoxConstraints(),
               icon: const Icon(Icons.public),
               enableFeedback: true,
               tooltip: 'Open with Browser',
-              onPressed: !webViewReady ? null : () async => await launch(await controller.currentUrl(),
+              onPressed: !webViewReady ? null : () async => await launch(await (controller!.currentUrl() as FutureOr<String>),
                 forceSafariVC: false,
                 forceWebView: false,
               ),
@@ -231,10 +232,10 @@ class NavigationControls extends StatelessWidget {
     );
   }
 
-  navigate(BuildContext context, WebViewController controller,
+  navigate(BuildContext context, WebViewController? controller,
       {bool goBack: false}) async {
     bool canNavigate =
-    goBack ? await controller.canGoBack() : await controller.canGoForward();
+    goBack ? await controller!.canGoBack() : await controller!.canGoForward();
     if (canNavigate) {
       goBack ? controller.goBack() : controller.goForward();
     } else {

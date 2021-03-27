@@ -7,7 +7,7 @@ import 'settings.dart';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key}) : super(key: key);
+  SettingsPage({Key? key}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -31,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
       context,
       MaterialPageRoute(builder: (context) => MyHomePage()),
     );
+    throw '';
   }
 
   Widget buildInstance(BuildContext context) {
@@ -59,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
           } else {
             setState(() {
               searxURL = request.url;
-              Settings().setURL(searxURL);
+              Settings().setURL(searxURL!);
               Navigator.pop(context);
             });
             return NavigationDecision.prevent; //Put in setState?
@@ -85,8 +86,8 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
           children: <Widget>[
             new ListTile(
               title: Text('Pi-hole URL (Optional)'),
-              trailing: new Text(piholeURL),
-              onTap: () {
+              trailing: new Text(piholeURL!),
+              onTap: () async {
                 return showDialog(
                   barrierDismissible: true,
                   context: context,
@@ -101,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
             ),
             new ListTile(
               title: Text('Searx URL'),
-              trailing: new Text(searxURL),
+              trailing: new Text(searxURL!),
               onTap: () {
                 Fluttertoast.showToast(
                     msg: "Click on the link you want to change to",
@@ -116,7 +117,7 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
                   MaterialPageRoute(builder: (context) => buildInstance(context)),
                 );
               },
-              onLongPress: () {
+              onLongPress: () async {
                 return showDialog(
                   barrierDismissible: true,
                   context: context,
@@ -144,7 +145,7 @@ class SearxURLDialogState extends State<SearxURLDialog> {
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = new TextEditingController();
-    controller.text = searxURL;
+    controller.text = searxURL!;
 
     return SimpleDialog(
       title: Text('Enter URL'),
@@ -159,7 +160,7 @@ class SearxURLDialogState extends State<SearxURLDialog> {
         new TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Settings().setURL(searxURL);
+              Settings().setURL(searxURL!);
             },
             child: Text('Ok'))
       ],
@@ -177,7 +178,7 @@ class PiholeURLDialogState extends State<PiholeURLDialog> {
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = new TextEditingController();
-    controller.text = piholeURL;
+    controller.text = piholeURL!;
 
     return SimpleDialog(
       title: Text('Enter URL'),
@@ -192,7 +193,7 @@ class PiholeURLDialogState extends State<PiholeURLDialog> {
         new TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Settings().setPiholeURL(piholeURL);
+              Settings().setPiholeURL(piholeURL!);
             },
             child: Text('Ok'))
       ],
