@@ -211,7 +211,7 @@ class NavigationControls extends StatelessWidget {
               icon: const Icon(Icons.public),
               enableFeedback: true,
               tooltip: 'Open with Browser',
-              onPressed: !webViewReady ? null : () async => await launch(await (controller!.currentUrl() as FutureOr<String>),
+              onPressed: !webViewReady ? null : () async => await launch((await controller!.currentUrl())!,
                 forceSafariVC: false,
                 forceWebView: false,
               ),
