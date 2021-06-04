@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 String? searxURL;
 String? piholeURL;
-String defaultURL = "https://search.disroot.org";
+String defaultURL = "https://searx.zackptg5.com";
 String title = 'Searx';
 
 class Settings {
