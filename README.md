@@ -4,7 +4,7 @@ Unofficial android app for searching the web with Searx. Uses Flutter webview. N
 
 ## Usage
 
-* Default instance is https://search.disroot.org
+* Default instance is https://searx.zackptg5.com
 * Navigation Options:
   * Home - tap on the title (top left text - searx instance name)
     * Pi-hole - long tap on title (if pi-hole url is set)
