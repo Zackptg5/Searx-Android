@@ -85,22 +85,6 @@ class _SettingsPageState extends State<SettingsPage> with WidgetsBindingObserver
           padding: EdgeInsets.all(10),
           children: <Widget>[
             new ListTile(
-              title: Text('Pi-hole URL (Optional)'),
-              trailing: new Text(piholeURL!),
-              onTap: () async {
-                return showDialog(
-                  barrierDismissible: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return new PiholeURLDialog();
-                  },
-                ).then((var a) {
-                  setState(() {});
-                });
-              },
-              subtitle: Text('Tap to change URL. Long press the title (searx instance name - top left of main bar) to open pi-hole'),
-            ),
-            new ListTile(
               title: Text('Searx URL'),
               trailing: new Text(searxURL!),
               onTap: () {
@@ -168,37 +152,3 @@ class SearxURLDialogState extends State<SearxURLDialog> {
     );
   }
 }
-
-class PiholeURLDialog extends StatefulWidget {
-  @override
-  PiholeURLDialogState createState() => new PiholeURLDialogState();
-}
-
-class PiholeURLDialogState extends State<PiholeURLDialog> {
-  @override
-  Widget build(BuildContext context) {
-    TextEditingController controller = new TextEditingController();
-    controller.text = piholeURL!;
-
-    return SimpleDialog(
-      title: Text('Enter URL'),
-      children: [
-        new TextField(
-          onChanged: (String value) {
-            piholeURL = value;
-          },
-          autofocus: true,
-          controller: controller,
-        ),
-        new TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Settings().setPiholeURL(piholeURL!);
-            },
-            child: Text('Ok'))
-      ],
-      contentPadding: EdgeInsets.all(10),
-    );
-  }
-}
-

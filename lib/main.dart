@@ -72,14 +72,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
-  Future<bool> back() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MyHomePage()),
-    );
-    throw '';
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -104,60 +96,33 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget buildPihole(BuildContext context) {
+  Widget buildMain(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pihole'),
+        automaticallyImplyLeading: false,
+        title: TextButton(
+          style: TextButton.styleFrom(
+            primary: Colors.white,
+          ),
+          onPressed: () {
+            Phoenix.rebirth(context);
+          },
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
+        actions: <Widget>[
+          NavigationControls(_controller.future),
+        ],
       ),
       body: WebView(
-        initialUrl: piholeURL,
+        initialUrl: searxURL,
         javascriptMode: JavascriptMode.unrestricted,
         onWebViewCreated: (WebViewController webViewController) {
-          _MyHomePageState()._controller.complete(webViewController);
+          _controller.complete(webViewController);
         },
-      ),
-    );
-  }
-
-  Widget buildMain(BuildContext context) {
-    return new WillPopScope(
-      onWillPop: back,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: TextButton(
-            style: TextButton.styleFrom(
-              primary: Colors.white,
-            ),
-            onPressed: () {
-              Phoenix.rebirth(context);
-            },
-            onLongPress: () {
-              if (piholeURL != 'Not Set') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => buildPihole(context)),
-                );
-              }
-            },
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 20.0),
-            ),
-          ),
-          // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-          actions: <Widget>[
-            NavigationControls(_controller.future),
-          ],
-        ),
-        body: WebView(
-          initialUrl: searxURL,
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-        ),
       ),
     );
   }
@@ -171,8 +136,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 }
 
 class NavigationControls extends StatelessWidget {
-  const NavigationControls(this._webViewControllerFuture)
-      : assert(_webViewControllerFuture != null);
+  const NavigationControls(this._webViewControllerFuture);
 
   final Future<WebViewController> _webViewControllerFuture;
 

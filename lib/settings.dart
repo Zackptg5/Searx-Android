@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 String? searxURL;
-String? piholeURL;
 String defaultURL = "https://searx.zackptg5.com";
 String title = 'Searx';
 
@@ -15,26 +14,15 @@ class Settings {
     await (await prefs).setString("url", data);
   }
 
-  void setPiholeURL(String data) async {
-    await (await prefs).setString("url2", data);
-  }
-
-  Future<void> errURL(num, url) async {
+  Future<void> errURL(url) async {
     String msg;
-    if (num == 0) {
-      if (url == defaultURL) {
-        msg = "Unable to load default instance! Change instance to something else";
-        title = 'Searx';
-      } else {
-        msg = "Invalid Searx URL! Setting to default";
-        searxURL = defaultURL;
-        await (await prefs).remove("url");
-      }
+    if (url == defaultURL) {
+      msg = "Unable to load default instance! Change instance to something else";
+      title = 'Searx';
     } else {
-      if (url == 'Not Set') {return null;}
-      msg = "Invalid Pi-hole URL! Disabling Pi-hole functionality!";
-      piholeURL = 'Not Set';
-      await (await prefs).remove("url2");
+      msg = "Invalid Searx URL! Setting to default";
+      searxURL = defaultURL;
+      await (await prefs).remove("url");
     }
     await Fluttertoast.showToast(
       msg: msg,
@@ -48,19 +36,14 @@ class Settings {
 
   Future<String?> getURL() async {
     searxURL = (await prefs).getString("url") ?? defaultURL;
-    piholeURL = (await prefs).getString("url2") ?? 'Not Set';
-    List<String?> items = [searxURL, piholeURL];
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i]!;
-      try {
-        var response = (await http.get(Uri.parse(item))).statusCode;
-        if (response != 200) {
-          await errURL(i, item);
+    try {
+      var response = (await http.get(Uri.parse(searxURL!))).statusCode;
+      if (response != 200) {
+        await errURL(searxURL);
         }
       } catch (err) {
-        await errURL(i, item);
+        await errURL(searxURL);
       }
-    }
     // Set title of appbar to title of searx instance (webpage title)
     var webpage = (await http.read(Uri.parse(searxURL!)));
     title = webpage.substring((webpage.indexOf('<title>') + 7), (webpage.indexOf('</title>')));
