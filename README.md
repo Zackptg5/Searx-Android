@@ -18,3 +18,8 @@ Unofficial android app for searching the web with Searx. Uses Flutter webview. N
 ## Notes
 
 * Tested/built for android only, not iOS
+
+## Download
+See [v1.0 release](https://github.com/Zackptg5/Searx-Android/releases/tag/v1.0)
+
+I have no plans of updating this in the future, feel free to fork and change/publish whatever
