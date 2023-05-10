@@ -4,7 +4,7 @@ Unofficial android app for searching the web with Searx. Uses Flutter webview. N
 
 ## Usage
 
-* Default instance is one of mine: https://searx.fmac.xyz
+* Default instance is one of mine: https://searxng.zackptg5.com (change code to: https://searx.fmac.xyz but didn't get around to recompiling for it)
 * Navigation Options:
   * Home - tap on the title (top left text - searx instance name)
   * Back
