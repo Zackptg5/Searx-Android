@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 String? searxURL;
-String defaultURL = "https://searxng.zackptg5.com";
+String defaultURL = "https://searx.fmac.xyz";
 String title = 'Searx';
 
 class Settings {
